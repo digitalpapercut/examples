@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+#Description
+#This script uses namp and python3-nmap to do a syn scan only of the IP addresses and
+#creates a CSV of the IPs and open ports found. 
+#Versioning
+#digitalpapercut-20230218
+
+import csv
+import nmap
+
+def main():
+    target = ['x.x.x.x/xx', 'x.x.x.x/xx'] #replace with IP addresses you want to scan.
+
+    scanner = nmap.PortScanner()
+#Scans each IP range using -sS
+    for ip in target:
+        scanner.scan(hosts=ip, arguments='-sS')
+#Opens the csv file to write the output from the scan
+    with open('nmap1.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['IP', 'Open Ports'])
+        for hosts in scanner.all_hosts():
+            open_ports = scanner[hosts]['tcp'].keys()
+            if open_ports:
+                writer.writerow([hosts, ' '.join(map(str, open_ports))])
+
+if __name__ == "__main__":
+    main()
