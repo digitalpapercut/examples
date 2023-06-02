@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+#Description
+#This program reads the dhcpdsmall.log file to find and create a list of 
+#Mac addresses, IP addresses, and total number of acks and then outputs that
+#file to ProblemMacs.txt.
+#Versioning
+#digitalpapercut-20230211
+
+import csv
+
+def main():
+#Dictionary to store the information of MACS and IP addresses
+    macs_ips = {}
+#Reads the log file and splits it to find the MAC addresses
+#and IP addresses
+    with open("dhcpdsmall.log", 'r') as file:
+        for line in file:
+            if "DHCPACK" in line:
+                split_line = line.split()
+                mac_address = split_line[9]
+                ip_address = split_line[7]
+#Creates the key as a combo of MAC and IP and increases count
+#for everytime the combo is found
+                key = mac_address + '-' + ip_address
+                if key not in macs_ips:
+                    macs_ips[key] = 1
+                else:
+                    macs_ips[key] += 1
+#Writes the csv file with the list of MACS, IPs, and total ACKS
+    with open('dhcpdack.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Mac Address', 'IP Address', 'Total Number of ACKs'])
+        for key, value in macs_ips.items():
+            mac_address, ip_address = key.split('-')
+            writer.writerow([mac_address, ip_address, macs_ips[key]])
+#Finds which MAC addresses have the most acks
+    num_acks = list(macs_ips.values())
+    num_acks.sort(reverse=True)
+    problem_macs = []
+    for key, value in macs_ips.items():
+        if value >= num_acks[1]:
+            problem_macs.append((key, value))
+#Writes the text file with the two problem MAC addresses
+    with open('ProblemMacs.txt', 'w') as file:
+        file.write("Problem Macs:\n")
+        for mac in problem_macs:
+            file.write(f"{mac[0]}: {mac[1]} ACKS\n")
+
+
+if __name__ == "__main__":
+    main()
