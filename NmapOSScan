@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+#Description
+#This script takes the nmap1.csv results and performs the OS scan on it
+#then outputs that information to the nmap2.csv file 
+#Versioning
+#digitalpapercut-20230218
+
+import csv
+import nmap3
+
+def main():
+    with open('nmap1.csv', 'r') as input_file:
+        reader = csv.reader(input_file)
+        header = next(reader)
+        ips = header.index('IP')
+        open_ports = header.index('Open Ports')
+        ip_list = [[row[ips], row[open_ports]] for row in reader]
+
+    scanner = nmap3.Nmap()
+
+    
+    results_list = []
+    for ip in ip_list:
+        try:       
+            results = scanner.nmap_os_detection(ip[0])
+            os = results[ip[0]]['osmatch'][0]['name']      
+        except:
+            os = 'Unkown'
+        results_list.append((ip[0], ip[1], os))
+
+    with open('nmap2.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['IP', 'Open Ports', 'OS'])
+        for row in results_list:
+            writer.writerow(row)
+
+if __name__ == "__main__":
+    main()
