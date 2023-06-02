@@ -1,0 +1,42 @@
+#!/usr/bin/python3
+#Description
+#This script will read the wafeventlog file and create a csv file that counts
+#the number of redirects and shows Count, From, and To. 
+#Versioning
+#digitalpapercut-20230212
+
+import csv
+
+def main():
+    redirects = {}
+
+    with open('wafeventlog', 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            if 'msg "REDIRECT: ' in line:
+                if 'msg "REDIRECT: Basic' in line:
+                    continue
+                if 'ActiveSync' in line:
+                    continue
+            parts = line.split('] [')
+            redirects = parts[3]
+            data = parts[3].replace('msg "REDIRECT:','')
+            if 'msg' in data:
+                continue
+     #       print(data)
+
+
+            recipients = data.split(' to ')
+            msg_to = recipients[1]
+            msg_from = recipients[0]
+
+#            print(msg_from, msg_to)
+    with open('redirects', 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Count', 'From', 'To'])
+        
+
+
+
+if __name__ == "__main__":
+    main()
