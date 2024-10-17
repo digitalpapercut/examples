@@ -1,2 +1,2 @@
 # examples
-These are various python scripts that I have written to perform tasks like nmap scanning and database updates. 
+These are various simple scripts that I have written for practice. 
